@@ -9,6 +9,8 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.server.ServerWebExchange;
 
+import java.util.Objects;
+
 @Slf4j
 @Controller
 public class UserController {
@@ -19,22 +21,27 @@ public class UserController {
         this.apiService = apiService;
     }
 
-    @GetMapping({"","/","/index"})
-    public String index(){
+    @GetMapping({"", "/", "/index"})
+    public String index() {
         return "index";
     }
 
     @PostMapping("/users")
-    public String formPost(Model model, ServerWebExchange serverWebExchange){
-        MultiValueMap<String, String> map = serverWebExchange.getFormData().block();
+    public String formPost(Model model, ServerWebExchange serverWebExchange) {
+//        MultiValueMap<String, String> map = serverWebExchange.getFormData().block();
+//
+//        int limit = Integer.parseInt(map.get("limit").get(0));
+//
+//        if(limit == 0){
+//            limit = 10;
+//        }
+//
+//        model.addAttribute("users", apiService.getUsers(limit));
 
-        int limit = Integer.parseInt(map.get("limit").get(0));
 
-        if(limit == 0){
-            limit = 10;
-        }
-
-        model.addAttribute("users", apiService.getUsers(limit));
+        model.addAttribute("users", apiService.getUsers(serverWebExchange
+                .getFormData()
+                .map(data -> Integer.valueOf(Objects.requireNonNull(data.getFirst("limit"))))));
 
         return "userlist";
     }
